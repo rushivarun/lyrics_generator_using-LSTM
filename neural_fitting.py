@@ -60,4 +60,4 @@ filepath = "weight-improvement-{epoch:02d}-{loss:4f}.hd5"
 checkpoint = ModelCheckpoint(filepath,monitor = "loss", verbose = 1,save_best_only = True,mode = "min")
 callbacks_list = [checkpoint]
 
-model.fit(x, y, batch_size = 128, epochs = 10,callbacks = callbacks_list)  
+model.fit(x, y, batch_size = 1280, epochs = 10,callbacks = callbacks_list)  
