@@ -43,12 +43,12 @@ for i, sentence in enumerate(sentences):
 from keras.models import Sequential
 from keras.layers import Dropout
 from keras.callbacks import ModelCheckpoint
-from keras.layers import Dense, Activation
+from keras.layers import Dense, Activation, Bidirectional
 from keras.optimizers import RMSprop
 from keras.layers import LSTM
 
 model = Sequential()
-model.add(LSTM(128, input_shape=(maxlen,len(chars)), return_sequences = True))
+model.add(Bidirectional(LSTM(128, input_shape=(maxlen,len(chars)), return_sequences = True)))
 model.add(Dropout(0.2))
 model.add(LSTM(128))
 model.add(Dropout(0.2))
