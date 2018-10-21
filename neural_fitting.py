@@ -45,16 +45,18 @@ from keras.layers import Dropout
 from keras.callbacks import ModelCheckpoint
 from keras.layers import Dense, Activation, Bidirectional
 from keras.optimizers import RMSprop
-from keras.layers import LSTM
+from keras.layers import LSTM,CuDNNLSTM,CuDNNGRU
 
 model = Sequential()
-model.add(Bidirectional(LSTM(128, input_shape=(maxlen,len(chars)), return_sequences = True)))
+model.add(Bidirectional(CuDNNLSTM(128, input_shape=(maxlen,len(chars)), return_sequences = True)))
 model.add(Dropout(0.2))
-model.add(LSTM(128))
+model.add(Bidirectional(CuDNNLSTM(128,return_sequences = True)))
+model.add(Dropout(0.2))
+model.add(Bidirectional(CuDNNLSTM(64)))
 model.add(Dropout(0.2))
 model.add(Dense(len(chars)))
 model.add(Activation('softmax'))
-model.compile(loss='categorical_crossentropy', optimizer =RMSprop(lr=0.01))
+model.compile(loss='categorical_crossentropy', optimizer = RMSprop(lr=0.01))
 
 filepath = "weight-improvement-{epoch:02d}-{loss:4f}.hd5"
 checkpoint = ModelCheckpoint(filepath,monitor = "loss", verbose = 1,save_best_only = True,mode = "min")
