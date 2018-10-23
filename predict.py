@@ -4,12 +4,19 @@ Created on Tue Oct 23 19:16:30 2018
 
 @author: tanma
 """
-
+# Importing Modules
 import numpy as np
 import pandas as pd
 import random
 import re
-from keras.models import load_model
+import flask
+import os
+from flask_cors import CORS
+from flask import request
+from load import *
+from keras.models import model_from_json, load_model
+
+
 # Importing Data
 data = pd.read_csv('drake-songs.csv')
 
@@ -47,24 +54,39 @@ for i, sentence in enumerate(sentences):
   y[i, char_indices[next_char[i]]] = 1
 
 # Loading the Saved Trained Model  
-model = load_model('model.h5')
+
 
 # Predicting
-generated = ''
-start_index = random.randint(0,len(text)-maxlen-1)
-sent = text[start_index:start_index+maxlen]
-generated += sent
-for i in range(200):
-    x_sample = generated[i:i+maxlen]
-    x = np.zeros((1,maxlen,vocab_size))
-    for j in range(maxlen):
-        x[0,j,char_indices[x_sample[j]]] = 1
-    probs = model.predict(x)
-    probs = np.reshape(probs,probs.shape[1])
-    ix = np.random.choice(range(vocab_size),p=probs.ravel())
-    generated += indices_char[ix]
+global model,graph
+model,graph = init()
 
-print('Start')
-print(sent)		 
-print('Returning prediction...')
-print(generated)  
+
+app = flask.Flask(__name__)
+
+CORS(app)
+
+@app.route("/predict", methods=["GET"])
+def predict():
+    generated = ''
+    start_index = random.randint(0,len(text)-maxlen-1)
+    sent = text[start_index:start_index+maxlen]
+    generated += sent
+    for i in range(200):
+        x_sample = generated[i:i+maxlen]
+        x = np.zeros((1,maxlen,vocab_size))
+        for j in range(maxlen):
+            x[0,j,char_indices[x_sample[j]]] = 1
+        probs = model.predict(x)
+        probs = np.reshape(probs,probs.shape[1])
+        ix = np.random.choice(range(vocab_size),p=probs.ravel())
+        generated += indices_char[ix]
+    print('Returning prediction...')
+    data = {'lyrics' : generated}
+    return flask.jsonify(data)
+
+if __name__ == '__main__':
+	port = int(os.environ.get("PORT", 5000))
+	print('Starting app...')
+	app.run(host='0.0.0.0', port=port)
+
+   
