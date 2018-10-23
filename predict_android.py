@@ -74,8 +74,8 @@ from google.cloud import firestore
 path=r"C:\Users\tanma\Desktop\GitHub\lyrics_generator_using-LSTM\neural-net-lyric-generator-firebase-adminsdk-kwdi8-b2b16610ef.json"
 os.environ['GOOGLE_APPLICATION_CREDENTIALS']=path
 db=firestore.Client()
-forecasts = db.collection(u'Generated-Data').document(u"Data")
-forecasts.update({
+generations = db.collection(u'Generated-Data').document(u"Data")
+generations.update({
     u'Start' : sent,
     u'Generated' : generated
             })
