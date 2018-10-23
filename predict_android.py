@@ -66,7 +66,6 @@ for i in range(200):
     probs = np.reshape(probs,probs.shape[1])
     ix = np.random.choice(range(vocab_size),p=probs.ravel())
     generated += indices_char[ix]
-    print('Returning prediction...')
    
 print(generated)
 
@@ -75,8 +74,8 @@ from google.cloud import firestore
 path=r"C:\Users\tanma\Desktop\GitHub\lyrics_generator_using-LSTM\neural-net-lyric-generator-firebase-adminsdk-kwdi8-b2b16610ef.json"
 os.environ['GOOGLE_APPLICATION_CREDENTIALS']=path
 db=firestore.Client()
-forecasts = db.collection(u'Generated-Data')
-forecasts.add({
+forecasts = db.collection(u'Generated-Data').document(u"Data")
+forecasts.update({
     u'Start' : sent,
-    u'status' : generated
+    u'Generated' : generated
             })
