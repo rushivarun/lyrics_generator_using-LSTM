@@ -10,12 +10,12 @@ import pandas as pd
 import random
 import re
 import flask
-import os
+import os.path
 from flask_cors import CORS
 from flask import request
 from load import *
-from keras.models import model_from_json, load_model
-
+from keras.models import load_model
+from flask import Response
 
 # Importing Data
 data = pd.read_csv('drake-songs.csv')
@@ -53,9 +53,6 @@ for i, sentence in enumerate(sentences):
     x[i, j, char_indices[char]] = 1
   y[i, char_indices[next_char[i]]] = 1
 
-# Loading the Saved Trained Model  
-
-
 # Predicting
 global model,graph
 model,graph = init()
@@ -65,24 +62,24 @@ app = flask.Flask(__name__)
 
 CORS(app)
 
-@app.route("/predict", methods=["GET"])
+@app.route("/", methods=["GET","POST"])
 def predict():
     generated = ''
-    start_index = random.randint(0,len(text)-maxlen-1)
-    sent = text[start_index:start_index+maxlen]
-    generated += sent
-    for i in range(200):
-        x_sample = generated[i:i+maxlen]
-        x = np.zeros((1,maxlen,vocab_size))
-        for j in range(maxlen):
-            x[0,j,char_indices[x_sample[j]]] = 1
-        probs = model.predict(x)
-        probs = np.reshape(probs,probs.shape[1])
-        ix = np.random.choice(range(vocab_size),p=probs.ravel())
-        generated += indices_char[ix]
+    with graph.as_default():
+    		start_index=random.randint(0,len(text)-maxlen-1)
+    		sent=text[start_index:start_index+maxlen]
+    		generated+=sent
+    		for i in range(200):
+    		    x_sample=generated[i:i+maxlen]
+    		    x=np.zeros((1,maxlen,vocab_size))
+    		    for j in range(maxlen):
+    		        x[0,j,char_indices[x_sample[j]]]=1
+    		    probs=model.predict(x)
+    		    probs=np.reshape(probs,probs.shape[1])
+    		    ix=np.random.choice(range(vocab_size),p=probs.ravel())
+    		    generated+=indices_char[ix]
     print('Returning prediction...')
-    data = {'lyrics' : generated}
-    return flask.jsonify(data)
+    return '<!DOCTYPE html><html lang="en"><head><title>Drake Song Generator</title><link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet"></head><body><div class="jumbotron"><h1 class="display-4">Drake Lyric Generator</h1><p class="lead">This is an Deep-Learning Model to generate Lyrics of the Famous Rappist Drake.</p><hr class="my-4"><p>It uses LSTM for time series prediction.</p></hr></div><div class="jumbotron"><h3 class="display-5">Start Text:</h3><div class="container"><p class="lead">'+sent+'</p></div><h3 class="display-5">Generated Text:</h3><div class="container"><p class="lead">'+generated+'</p></div></div></body></html>'
 
 if __name__ == '__main__':
 	port = int(os.environ.get("PORT", 5000))
