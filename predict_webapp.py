@@ -17,6 +17,7 @@ from load import *
 from keras.models import load_model
 from flask import Response
 
+
 # Importing Data
 data = pd.read_csv('drake-songs.csv')
 
@@ -79,11 +80,9 @@ def predict():
     		    ix=np.random.choice(range(vocab_size),p=probs.ravel())
     		    generated+=indices_char[ix]
     print('Returning prediction...')
-    return '<!DOCTYPE html><html lang="en"><head><title>Drake Song Generator</title><link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet"></head><body><div class="jumbotron"><h1 class="display-4">Drake Lyric Generator</h1><p class="lead">This is an Deep-Learning Model to generate Lyrics of the Famous Rappist Drake.</p><hr class="my-4"><p>It uses LSTM for time series prediction.</p></hr></div><div class="jumbotron"><h3 class="display-5">Start Text:</h3><div class="container"><p class="lead">'+sent+'</p></div><h3 class="display-5">Generated Text:</h3><div class="container"><p class="lead">'+generated+'</p></div></div></body></html>'
+    return '<!DOCTYPE html><html lang="en"><head><title>Drake Song Generator</title><link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet"></head><body><div class="jumbotron"><h1 class="display-4">Drake Lyric Generator</h1><p class="lead">This is an Deep-Learning Model to generate Lyrics of the Famous Rapper Drake.</p><hr class="my-4"><p>It uses LSTM for time series prediction.</p><p>Tanmay Thakur</p><p>Rushi Varun</p></hr></div><div class="jumbotron"><h3 class="display-5">Start Text:</h3><div class="container"><p class="lead">'+sent+'</p></div><h3 class="display-5">Generated Text:</h3><div class="container"><p class="lead">'+generated+'</p></div></div></body></html>'
 
 if __name__ == '__main__':
 	port = int(os.environ.get("PORT", 5000))
 	print('Starting app...')
 	app.run(host='0.0.0.0', port=port)
-
-   
