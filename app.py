@@ -13,7 +13,7 @@ from keras.models import Sequential
 from keras.layers import Dropout
 from keras.callbacks import ModelCheckpoint
 from keras.layers import Dense, Activation, Bidirectional
-from keras.layers import CuDNNLSTM
+from keras.layers import CuDNNLSTM,GlobalMaxPool1D
 
 # Importing Data
 data = pd.read_csv('drake-songs.csv')
@@ -54,26 +54,25 @@ for i, sentence in enumerate(sentences):
 
 # Model Construction
 model = Sequential()
-model.add(Bidirectional(CuDNNLSTM(128,input_shape = (maxlen,vocab_size),return_sequences = True)))
+model.add(Bidirectional(CuDNNLSTM(256,input_shape = (maxlen,vocab_size),return_sequences = True)))
 model.add(Dropout(0.2))
 model.add(Bidirectional(CuDNNLSTM(128, return_sequences = True)))
 model.add(Dropout(0.2))
-model.add(Bidirectional(CuDNNLSTM(128, return_sequences = True)))
+model.add(Bidirectional(CuDNNLSTM(64, return_sequences = True)))
 model.add(Dropout(0.2))
-model.add(Bidirectional(CuDNNLSTM(64)))
-model.add(Dropout(0.2))
+model.add(GlobalMaxPool1D())
 model.add(Dense(len(chars)))
 model.add(Activation('softmax'))
 model.compile(loss='categorical_crossentropy', optimizer = "nadam",metrics = ['accuracy'])
 
-# MOdel Fitting
+# Model Fitting
 filepath = "weight-improvement-{epoch:02d}-{loss:4f}.hd5"
 checkpoint = ModelCheckpoint(filepath,monitor = "loss", verbose = 1,save_best_only = True,mode = "min")
 callbacks_list = [checkpoint]
 
 model.fit(x, y, batch_size = 128, epochs = 10,callbacks = callbacks_list)  
 
-# Model Perfoemance
+# Model Performance
 model.summary()
 
 # Saving the Model
